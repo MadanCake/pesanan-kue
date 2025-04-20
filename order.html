@@ -249,133 +249,101 @@
 
 
     // start Fungsi form pada pengiriman pesan
-    $(document).ready(function () {
-        $('#form').on('submit', function (e) {
-            e.preventDefault();
-            if ($.trim($('input[name=nama_pemesan]').val()) === '' || $.trim($('input[name=jenis_kue]').val()) === '' || $.trim($('input[name=ukuran_kue]').val()) === '' || $.trim($('textarea[name=dekorasi_kue]').val()) === '' || $.trim($('textarea[name=tulisan_kue]').val()) === '' || $.trim($('input[name=tanggal_pengambilan]').val()) === '' || $.trim($('input[name=waktu_pengambilan]').val()) === '' || $.trim($('textarea[name=tambahan_kue]').val()) === '') {
-                Swal.fire('Error', 'Harap lengkapi semua data', 'error');
-                return;
-            } else {
+// start Fungsi form pada pengiriman pesan
+$(document).ready(function () {
+    $('#form').on('submit', function (e) {
+        e.preventDefault();
+        
+        // Validasi isian form
+        if (
+            $.trim($('input[name=nama_pemesan]').val()) === '' || 
+            $.trim($('input[name=jenis_kue]').val()) === '' || 
+            $.trim($('input[name=ukuran_kue]').val()) === '' || 
+            $.trim($('textarea[name=dekorasi_kue]').val()) === '' || 
+            $.trim($('textarea[name=tulisan_kue]').val()) === '' || 
+            $.trim($('input[name=tanggal_pengambilan]').val()) === '' || 
+            $.trim($('input[name=waktu_pengambilan]').val()) === '' || 
+            $.trim($('textarea[name=tambahan_kue]').val()) === ''
+        ) {
+            Swal.fire('Error', 'Harap lengkapi semua data', 'error');
+            return;
+        } 
+        
+        // Ambil data dari form
+        var pemesan = $('input[name=nama_pemesan]').val();
+        var jenis = $('input[name=jenis_kue]').val();
+        var ukuran = $('input[name=ukuran_kue]').val();
+        var dekorasi = $('textarea[name=dekorasi_kue]').val();
+        var tulisan = $('textarea[name=tulisan_kue]').val();
+        var tanggal_pengambilan = $('input[name=tanggal_pengambilan]').val();
+        var waktu_pengambilan = $('input[name=waktu_pengambilan]').val();
+        var tambahan = $('textarea[name=tambahan_kue]').val();
+        
+        // Format waktu pemesanan
+        const now = new Date();
+        const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+        const months = [
+            'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+            'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
+        ];
+        const dayOfWeek = days[now.getDay()];
+        const date = now.getDate();
+        const month = months[now.getMonth()];
+        const year = now.getFullYear();
+        const time = now.toLocaleTimeString('id-ID', { timeStyle: 'medium' });
+        const waktu = `${dayOfWeek}, ${date} ${month} ${year}, Pukul: ${time}`;
 
+        // Tampilkan konfirmasi
+        Swal.fire({
+            title: 'Apakah pesanan sudah benar?',
+            text: "Pesanan akan dikirim ke WhatsApp?",
+            icon: 'warning',
+            confirmButtonColor: '#006400',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Kirim',
+            showCancelButton: true,
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
                 Swal.fire({
                     position: 'top-middle',
                     icon: 'success',
-                    title: 'Data berhasil dikirim',
+                    title: 'Pesanan sudah dikirim',
                     showConfirmButton: false,
                     timer: 1500
-                })
+                });
 
-                var pemesan = $('input[name=nama_pemesan]').val(); // Get the value from input field
-                var jenis = $('input[name=jenis_kue]').val(); // Get the value from input field
-                var ukuran = $('input[name=ukuran_kue]').val(); // Replace with actual value
-                var dekorasi = $('textarea[name=dekorasi_kue]').val(); // Get the value from input field
-                var tulisan = $('textarea[name=tulisan_kue]').val(); // Get the value from input field
-                var tanggal_pengambilan = $('input[name=tanggal_pengambilan]').val(); // Get the value from input field
-                var waktu_pengambilan = $('input[name=waktu_pengambilan]').val(); // Get the value from input field
-                var tambahan = $('textarea[name=tambahan_kue]').val(); // Get the value from textarea field
-                const waktu = `${dayOfWeek}, ${date} ${month} ${year}, Pukul: ${time}`;
+                // Format pesan WhatsApp
+                var message = 
+                    "Halo Mimin Madan Cake pada hari" + " " + "*" + waktu + " " + "WIB" + "*" + " " +
+                    ". Perkenalan saya" + " " + "*" + pemesan + "*" + " " +
+                    "sebagai pemesan kue Madan Cake. Dengan ketentuan pesanan kue sebagai berikut.\n\n" +
+                    "Jenis Kue" + "\t" + ":" + " " + jenis + "\n" +
+                    "Ukuran" + "\t\t" + ":" + " " + ukuran + "\n" +
+                    "Dekorasi Kue" + "\t" + ":" + " " + dekorasi + "\n" +
+                    "Tulisan Kue" + "\t" + ":" + " " + tulisan + "\n" +
+                    "Tambahan Item Kue" + "\t" + ":" + " " + tambahan + "\n" +
+                    "Tanggal Pengambilan" + "\t" + ":" + " " + tanggal_pengambilan + "\n" +
+                    "Waktu Pengambilan" + "\t" + ":" + " " + waktu_pengambilan + "\n\n" +
+                    "Apabila ada lampiran gambar atau file akan saya kirimkan dibawah ini.";
 
-                if ($.trim($('textarea[name=link_url]').val()) === '') {
-
-                    Swal.fire({
-
-                        title: 'Apakah pesanan sudah benar?',
-                        text: "Data yang dikirim hanya data yang diisi?",
-                        icon: 'warning',
-                        confirmButtonColor: '#006400',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Kirim',
-                        showCancelButton: true,
-                        cancelButtonText: 'Batal',
-
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-
-                            Swal.fire({
-                                position: 'top-middle',
-                                icon: 'success',
-                                title: 'Pesanan sudah dikirim',
-                                showConfirmButton: false,
-                                timer: 1500
-                            })
-
-
-                            // Check if the file input is not empty
-                            if ($.trim($('textarea[name=link_url]').val()) !== '') {
-                                var link = $('textarea[name=link_url]').val(); // Replace with actual value
-
-                            } else {
-                                var link = '*' + 'Tidak ada file tambahan' + '*'; // Set default message if file input is empty
-                                var pemesan = $('input[name=nama_pemesan]').val(); // Get the value from input field
-                                var jenis = $('input[name=jenis_kue]').val(); // Get the value from input field
-                                var ukuran = $('input[name=ukuran_kue]').val(); // Replace with actual value
-                                var dekorasi = $('textarea[name=dekorasi_kue]').val(); // Get the value from input field
-                                var tulisan = $('textarea[name=tulisan_kue]').val(); // Get the value from input field
-                                var tambahan = $('textarea[name=tambahan_kue]').val(); // Get the value from textarea field
-                                var tanggal_pengambilan = $('input[name=tanggal_pengambilan]').val(); // Get the value from input field
-                                var waktu_pengambilan = $('input[name=waktu_pengambilan]').val(); // Get the value from input field
-                                const waktu = `${dayOfWeek}, ${date} ${month} ${year}, Pukul: ${time}`;
-
-
-
-                                // Open the WhatsApp URL in a new tab
-                                var message =
-
-                                    "Halo Mimin Madan Cake pada hari" + " " + "*" + waktu + " " + "WIB" + "*" + " " + " " +
-                                    ".Perkenalan saya" + " " + "*" + pemesan + "*" + " " +
-                                    "sebagai pemesan kue Madan Cake. Dengan ketentuan pesanan kue sebagai berikut.\n\n" +
-                                    "Jenis Kue" + "\t" + ":" + " " + jenis_kue + "\n\n" +
-                                    "Ukuran" + "\t\t" + ":" + " " + ukuran + "\n\n" +
-                                    "Dekorasi Kue" + "\t\t" + ":" + " " + dekorasi + "\n\n" +
-                                    "Tulisan Kue" + "\t" + ":" + " " + tulisan + "\n\n" +
-                                    "Tambahan Item Kue" + "\t" + ":" + " " + tambahan + "\n\n" +
-                                    "Tanggal Pengambilan" + "\t\t" + ":" + " " + tanggal_pengambilan + "\n\n" +
-                                    "Waktu Pengambilan:" + "\t" + ":" + " " + waktu + "\n\n" + "Tambahan Item Kue" + "\t" + ":" + " " + tambahan + "\n\n" + "Apabila ada lampiran gambar atau file akan saya kirimkan dibawah ini.";
-
-
-                                var url = "https://wa.me/62887436079204?text=" + encodeURIComponent(message);
-
-
-
-                               
-                                window.open(url, '_blank');
-                                setTimeout(function () {
-                                    window.location.reload();
-                                }, 5000); // 10 seconds
-                            }
-
-
-                        }
-                    });
-                    return;
-                }
-                // Open the WhatsApp URL in a new tab
-
-                var link = $('textarea[name=link_url]').val(); // Replace with actual value
-                "Halo Mimin Madan Cake pada hari" + " " + "*" + waktu + " " + "WIB" + "*" + " " + " " +
-                ".Perkenalan saya" + " " + "*" + pemesan + "*" + " " +
-                "sebagai pemesan kue Madan Cake. Dengan ketentuan pesanan kue sebagai berikut.\n\n" +
-                "Jenis Kue" + "\t" + ":" + " " + jenis_kue + "\n\n" +
-                "Ukuran" + "\t\t" + ":" + " " + ukuran + "\n\n" +
-                "Dekorasi Kue" + "\t\t" + ":" + " " + dekorasi + "\n\n" +
-                "Tulisan Kue" + "\t" + ":" + " " + tulisan + "\n\n" +
-                "Tambahan Item Kue" + "\t" + ":" + " " + tambahan + "\n\n" +
-                "Tanggal Pengambilan" + "\t\t" + ":" + " " + tanggal_pengambilan + "\n\n" +
-                "Waktu Pengambilan:" + "\t" + ":" + " " + waktu + "\n\n" + "Tambahan Item Kue" + "\t" + ":" + " " + tambahan + "\n\n" + "Apabila ada lampiran gambar atau file akan saya kirimkan dibawah ini.";
-
-
-                var url = "https://wa.me/62887436079204?text=" + encodeURIComponent(message);
-
-
+                // Nomor WhatsApp tujuan (pastikan format internasional)
+                var phoneNumber = "62887436079204"; // Ganti dengan nomor yang benar
+                
+                // Buat URL WhatsApp
+                var url = "https://wa.me/" + phoneNumber + "?text=" + encodeURIComponent(message);
+                
+                // Buka tab baru dengan URL WhatsApp
                 window.open(url, '_blank');
+                
+                // Reload halaman setelah 5 detik
                 setTimeout(function () {
                     window.location.reload();
-                }, 5000); // 10 seconds
-                // window.location.reload();
+                }, 5000);
             }
-
         });
     });
+});
 	// end Fungsi form pada Pengiriman pesan
 </script>
 
